@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #FFFFFF;
+				color: #FFFFFF;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+		
+
+		<script src="js/three.min.js"></script>
+		<script src="js/OBJLoader.js"></script>
+
+		<script>
+			var container;
+			var camera, scene, renderer;
+			var mouseX = 0, mouseY = 0;
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			init();
+			animate();
+			function init() {
+				container = document.createElement( 'div' );
+
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 500;
+				camera.position.y = 200;
+				camera.position.x = -500;
+
+				
+				// scene
+				scene = new THREE.Scene();
+				var ambient = new THREE.AmbientLight( 0xc9c9c9);
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1);
+				directionalLight.position.set( -10, -10, -10 );
+
+				var directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1);
+				directionalLight.position.set( 10, 10, 10 );
+
+				var directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1);
+				directionalLight.position.set( 900, 900, 900);
+
+				scene.add( directionalLight );
+
+
+
+
+				var pointLight =
+			  		new THREE.PointLight(0xFFFFFF);
+
+				// set its position
+				pointLight.position.x = 300;
+				pointLight.position.y = 200;
+				pointLight.position.z = 200;
+				scene.add(pointLight);
+
+				pointLight.position.x = -10;
+				pointLight.position.y = -10;
+				pointLight.position.z = -10;
+				scene.add(pointLight);
+
+				pointLight.position.x = -10;
+				pointLight.position.y = -10;
+				pointLight.position.z = 0;
+				// add to the scene
+				scene.add(pointLight);
+
+
+				pointLight.position.x = 10;
+				pointLight.position.y = 10;
+				pointLight.position.z = 0;
+				// add to the scene
+				scene.add(pointLight);
+
+				var geometry = new THREE.SphereGeometry( 20, 20, 20 );
+				var m = new THREE.MeshLambertMaterial( {color: Math.random() * 0x808080 + 0x808080,} );
+				var sphere = new THREE.Mesh( geometry, m );
+				sphere.position.y = 0;
+				sphere.position.x = 0;
+				sphere.position.z = 0;
+				//scene.add( sphere );
+
+				// texture
+				var manager = new THREE.LoadingManager();
+				manager.onProgress = function ( item, loaded, total ) {
+					console.log( item, loaded, total );
+				};
+				var texture = new THREE.Texture();
+				var onProgress = function ( xhr ) {
+					if ( xhr.lengthComputable ) {
+						var percentComplete = xhr.loaded / xhr.total * 100;
+						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+					}
+				};
+				var onError = function ( xhr ) {
+				};
+		
+
+
+				var material = new THREE.MeshPhongMaterial( { color: 0x335e9d, specular: 0x111111, shininess: 70 } );
+
+				var loader = new THREE.OBJLoader( manager );
+				loader.load( 'js/leg4.obj', function ( object ) {
+					object.traverse( function ( child ) {
+						// if ( child instanceof THREE.Mesh ) {
+						// 	child.material= material;
+						// }
+						child.castShadow = true;
+
+      					child.receiveShadow = true;
+
+					} );
+					object.position.y = - 80;
+					scene.add( object );
+				}, onProgress, onError );
+				
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				//
+				window.addEventListener( 'resize', onWindowResize, false );
+
+
+			}
+			function onWindowResize() {
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+			function onDocumentMouseMove( event ) {
+				mouseX = ( event.clientX - windowHalfX ) / 2;
+				mouseY = ( event.clientY - windowHalfY ) / 2;
+			}
+			//
+			function animate() {
+				requestAnimationFrame( animate );
+				render();
+			}
+			function render() {
+				camera.position.x += ( mouseX - camera.position.x ) * .5;
+				camera.position.y += ( - mouseY - camera.position.y ) * .5;
+				camera.lookAt( scene.position );
+				renderer.render( scene, camera );
+			}
+		</script>
+
+	</body>
+</html>
