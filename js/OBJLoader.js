@@ -1,9 +1,47 @@
 
+var geo = new THREE.Geometry();
+var raycaster;
+var mouse;
+var INTERSECTED;
+var objects = [];
+var projector;
+raycaster = new THREE.Raycaster();
+mouse = new THREE.Vector2();
+projector = new THREE.Projector();
+
 THREE.OBJLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
+
+
+
+function onDocumentMouseDown( event ) {
+
+	event.preventDefault();
+
+	var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+	projector.unprojectVector( vector, camera );
+	var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+
+	var intersects = raycaster.intersectObjects( objects,true );
+
+	if ( intersects.length > 0 ) {
+		var geometry = new THREE.SphereGeometry( 3, 20, 20 );
+		var material = new THREE.MeshLambertMaterial( {color: 0x335e9d,} );
+		var sphere = new THREE.Mesh( geometry, material );
+		var v = intersects[ 0 ].face.a;
+		sphere.position.y = intersects[ 0 ].point.y;
+		sphere.position.x = intersects[ 0 ].point.x;
+		sphere.position.z = intersects[ 0 ].point.z;
+		scene.add( sphere );
+	}
+
+
+}
+
+        
 
 THREE.OBJLoader.prototype = {
 
@@ -28,7 +66,7 @@ THREE.OBJLoader.prototype = {
 
 		var container = new THREE.Object3D();
 
-		var geo = new THREE.Geometry();
+		
 
 		//stores colors of vertices
 		var vcolors = [];

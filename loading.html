@@ -26,6 +26,12 @@
 			var mouseX = 0, mouseY = 0;
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+			
+			//added objects array
+			var objects = [];
+		
+
+
 			init();
 			animate();
 			function init() {
@@ -85,12 +91,6 @@
 				// add to the scene
 				scene.add(pointLight);
 
-				var geometry = new THREE.SphereGeometry( 20, 20, 20 );
-				var m = new THREE.MeshLambertMaterial( {color: Math.random() * 0x808080 + 0x808080,} );
-				var sphere = new THREE.Mesh( geometry, m );
-				sphere.position.y = 0;
-				sphere.position.x = 0;
-				sphere.position.z = 0;
 				
 				//OBJECT LOADER WITH MANAGER START
 				var manager = new THREE.LoadingManager();
@@ -111,10 +111,13 @@
 				var loader = new THREE.OBJLoader( manager );
 				loader.load( 'js/leg4.obj', function ( object ) {
 					object.position.y = - 80;
+					objects.push( object );
 					scene.add( object );
 				}, onProgress, onError );
 				//END OF OBJECT LOADER
-				
+
+				 document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -123,6 +126,7 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				
 				window.addEventListener( 'resize', onWindowResize, false );
+        
 
 
 			}
@@ -142,10 +146,24 @@
 				requestAnimationFrame( animate );
 				render();
 			}
+
+
+
+			var radius = 500;
+			var theta = 0;
 			function render() {
 				camera.position.x += ( mouseX - camera.position.x ) * .5;
 				camera.position.y += ( - mouseY - camera.position.y ) * .5;
 				camera.lookAt( scene.position );
+
+				// theta += 0.002;
+				// camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				// camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				// camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				// camera.lookAt( scene.position );
+				// camera.updateMatrixWorld();
+
+				// requestAnimationFrame( render );
 				renderer.render( scene, camera );
 			}
 		</script>
